@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>leo_examples</name>
+  <version>0.0.0</version>
+  <description>
+    Example functionalities developed on top of stock Leo Rover.
+  </description>
+
+  <maintainer email="support@fictionlab.pl">Fictionlab</maintainer>
+  <author email="blazej@fictionlab.pl">Błażej Sowa</author>
+
+  <license>MIT</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+</package>
