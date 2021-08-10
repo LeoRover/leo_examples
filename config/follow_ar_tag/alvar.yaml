@@ -1,0 +1,7 @@
+# Marker size in cm
+marker_size: 16.0
+
+max_new_marker_error: 0.08
+max_track_error: 0.2
+max_frequency: 8.0
+output_frame: base_link
