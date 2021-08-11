@@ -15,7 +15,7 @@ class ARTagFollower:
         self.marker_angle = 0.0
         self.marker_distance = 0.0
 
-        self.last_odom = TwistStamped()
+        self.last_odom_ts = None
         self.odom_position = Vector3()
         self.odom_yaw = 0.0
 
@@ -78,11 +78,12 @@ class ARTagFollower:
         self.twist_cmd.angular.z = dir * ang_cmd
 
     def update_marker_angle_distance(self):
-        position = self.last_marker_position
-        self.marker_angle = math.atan(position.y / position.x)
+        position_x = self.last_marker_position.x - self.odom_position.x
+        position_y = self.last_marker_position.y - self.odom_position.y
+        self.marker_angle = math.atan(position_y / position_x) - self.odom_yaw
         self.marker_distance = math.sqrt(
-            position.x * position.x + position.y * position.y
-        )        
+            position_x * position_x + position_y * position_y
+        )
 
     def callback_ar_pose(self, msg):
         for marker in msg.markers:
@@ -102,9 +103,31 @@ class ARTagFollower:
             self.update_marker_angle_distance()
 
     def callback_wheel_odom(self, msg):
-        # 
+        if self.last_odom_ts:
+            start_ts = self.last_odom_ts
+            if self.last_marker_ts > start_ts:
+                start_ts = self.last_marker_ts
 
-        self.last_odom = msg
+            end_ts = msg.header.stamp
+            if end_ts < start_ts:
+                rospy.logwarn(
+                    "Reveived odometry has timestamp older than last marker position"
+                )
+
+            step_duration = (end_ts - start_ts).to_sec()
+
+            # Integrate the velocity using rectangular rule
+            self.odom_yaw += msg.twist.angular.z * step_duration
+            self.odom_position.x += (
+                msg.twist.linear.x * math.cos(self.odom_yaw) * step_duration
+            )
+            self.odom_position.y += (
+                msg.twist.linear.x * math.sin(self.odom_yaw) * step_duration
+            )
+
+            self.update_marker_angle_distance()
+
+        self.last_odom_ts = msg.header.stamp
 
 
 if __name__ == "__main__":

@@ -1,9 +1,9 @@
 # The ID of the marker to follow
 follow_id: 0
 
-marker_timeout: 0.5
+marker_timeout: 1.0
 
-min_ang_vel: 0.3
+min_ang_vel: 0.1
 max_ang_vel: 1.0
 
 angle_min: 0.1
