@@ -8,10 +8,24 @@ from geometry_msgs.msg import Twist, TwistStamped, Vector3
 from ar_track_alvar_msgs.msg import AlvarMarkers
 
 
+def translate(value, leftMin, leftMax, rightMin, rightMax):
+    value = min(max(value, leftMin), leftMax)
+
+    # Figure out how 'wide' each range is
+    leftSpan = leftMax - leftMin
+    rightSpan = rightMax - rightMin
+
+    # Convert the left range into a 0-1 range (float)
+    valueScaled = float(value - leftMin) / float(leftSpan)
+
+    # Convert the 0-1 range into a value in the right range.
+    return rightMin + (valueScaled * rightSpan)
+
+
 class ARTagFollower:
     def __init__(self):
         self.last_marker_ts = rospy.Time()
-        self.last_marker_position = Vector3()
+        self.last_marker_position = None
         self.marker_angle = 0.0
         self.marker_distance = 0.0
 
@@ -39,6 +53,14 @@ class ARTagFollower:
         self.max_ang_vel = rospy.get_param("~max_ang_vel", 1.0)
         self.angle_min = rospy.get_param("~angle_min", 0.1)
         self.angle_max = rospy.get_param("~angle_max", 0.7)
+        self.min_lin_vel_forward = rospy.get_param("~min_lin_vel_forward", 0.05)
+        self.max_lin_vel_forward = rospy.get_param("~max_lin_vel_forward", 0.2)
+        self.distance_min_forward = rospy.get_param("~distance_min_forward", 0.5)
+        self.distance_max_forward = rospy.get_param("~distance_max_forward", 2.0)
+        self.min_lin_vel_reverse = rospy.get_param("~min_lin_vel_reverse", 0.05)
+        self.max_lin_vel_reverse = rospy.get_param("~max_lin_vel_reverse", 0.2)
+        self.distance_min_reverse = rospy.get_param("~distance_min_reverse", 0.5)
+        self.distance_max_reverse = rospy.get_param("~distance_max_reverse", 2.0)
 
     def run(self):
         rate = rospy.Rate(10)
@@ -64,26 +86,45 @@ class ARTagFollower:
         if angle < self.angle_min:
             ang_cmd = 0.0
         else:
-            if angle > self.angle_max:
-                angle = self.angle_max
-
-            angle_scaled = (angle - self.angle_min) / (self.angle_max - self.angle_min)
-            ang_cmd = self.min_ang_vel + angle_scaled * (
-                self.max_ang_vel - self.min_ang_vel
+            ang_cmd = translate(
+                angle,
+                self.angle_min,
+                self.angle_max,
+                self.min_ang_vel,
+                self.max_ang_vel,
             )
 
         # Calculate linear command
-        # TODO
+        if self.marker_distance >= self.distance_min_forward:
+            lin_cmd = translate(
+                self.marker_distance,
+                self.distance_min_forward,
+                self.distance_max_forward,
+                self.min_lin_vel_forward,
+                self.max_lin_vel_forward,
+            )
+        elif self.marker_distance <= self.distance_max_reverse:
+            lin_cmd = -translate(
+                self.marker_distance,
+                self.distance_min_reverse,
+                self.distance_max_reverse,
+                self.max_lin_vel_reverse,
+                self.min_lin_vel_reverse,
+            )
+        else:
+            lin_cmd = 0.0
 
         self.twist_cmd.angular.z = dir * ang_cmd
+        self.twist_cmd.linear.x = lin_cmd
 
     def update_marker_angle_distance(self):
-        position_x = self.last_marker_position.x - self.odom_position.x
-        position_y = self.last_marker_position.y - self.odom_position.y
-        self.marker_angle = math.atan(position_y / position_x) - self.odom_yaw
-        self.marker_distance = math.sqrt(
-            position_x * position_x + position_y * position_y
-        )
+        if self.last_marker_position:
+            position_x = self.last_marker_position.x - self.odom_position.x
+            position_y = self.last_marker_position.y - self.odom_position.y
+            self.marker_angle = math.atan(position_y / position_x) - self.odom_yaw
+            self.marker_distance = math.sqrt(
+                position_x * position_x + position_y * position_y
+            )
 
     def callback_ar_pose(self, msg):
         for marker in msg.markers:
@@ -104,9 +145,7 @@ class ARTagFollower:
 
     def callback_wheel_odom(self, msg):
         if self.last_odom_ts:
-            start_ts = self.last_odom_ts
-            if self.last_marker_ts > start_ts:
-                start_ts = self.last_marker_ts
+            start_ts = max(self.last_odom_ts, self.last_marker_ts)
 
             end_ts = msg.header.stamp
             if end_ts < start_ts:
