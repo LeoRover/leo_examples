@@ -3,8 +3,8 @@ follow_id: 0
 
 marker_timeout: 0.5
 
-min_ang_vel: 0.5
-max_ang_vel: 2.0
+min_ang_vel: 0.3
+max_ang_vel: 1.0
 
 angle_min: 0.1
 angle_max: 0.7
