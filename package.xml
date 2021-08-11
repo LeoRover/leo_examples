@@ -14,5 +14,6 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <exec_depend>ar_track_alvar</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
 
 </package>

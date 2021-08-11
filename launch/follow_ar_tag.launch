@@ -13,4 +13,10 @@
 		<remap from="camera_info"   to="$(arg cam_info_topic)" />
 	</node>
 
+  <node name="follow_ar_tag"
+        pkg="leo_examples"
+        type="follow_ar_tag.py">
+		<rosparam command="load" file="$(find leo_examples)/config/follow_ar_tag/follow_ar_tag.yaml" />
+  </node>
+
 </launch>
