@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>leo_examples</name>
+  <name>leo_example_follow_ar_tag</name>
   <version>0.0.0</version>
   <description>
-    Example functionalities developed on top of stock Leo Rover.
+    Follow ARTag Example for Leo Rover.
   </description>
 
   <maintainer email="support@fictionlab.pl">Fictionlab</maintainer>
