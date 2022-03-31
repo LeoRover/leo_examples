@@ -31,7 +31,8 @@ class DataSaver():
         Path(self.path).mkdir(parents=True, exist_ok=True)
         
         date = datetime.datetime.now()
-        self.base_name = self.path + "/%s%s%s%s%s-img" % (date.day, date.month, date.year, date.hour, date.minute)
+        self.img_dir = self.path + "/"
+        self.img_base_name = "%s%s%s%s%s-img" % (date.day, date.month, date.year, date.hour, date.minute)
 
         rospy.loginfo("Opening label file (creating if deons't exist).")
         self.label_file = open(self.path +  "/labels.txt", "a+")
@@ -54,10 +55,10 @@ class DataSaver():
 
         
         cv_img = self.bridge.imgmsg_to_cv2(data, desired_encoding="bgr8")
-        img_name = self.base_name + str(self.counter) + ".jpg"
-        rospy.loginfo("{}:{}".format(img_name, self.label))
-        #cv2.imwrite(filename=img_name, img=cv_img, params=[cv2.IMWRITE_JPEG_QUALITY, 100])
-        #self.label_file.write("{}:{}".format(img_name, self.label))
+        img_name = self.img_base_name + str(self.counter) + ".jpg"
+
+        cv2.imwrite(filename=self.img_dir + img_name, img=cv_img, params=[cv2.IMWRITE_JPEG_QUALITY, 100])
+        self.label_file.write("{}:{}\n".format(img_name, self.label))
         self.counter += 1
         
 
@@ -65,7 +66,7 @@ class DataSaver():
         if not self.ready:
             self.ready = True
             self.end_time = rospy.Time.now() + rospy.Duration.from_sec(self.duration)
-        self.label = (data.linear.x, data.angular.z)
+        self.label = (round(data.linear.x, 2), round(data.angular.z, 2))
 
 
 def add_arguments(parser: argparse.ArgumentParser):
