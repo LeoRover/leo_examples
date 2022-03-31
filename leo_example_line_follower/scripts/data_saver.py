@@ -1,28 +1,35 @@
 #!/usr/bin/env python
 
 import rospy
-import rospkg
 from sensor_msgs.msg import Image
 from geometry_msgs.msg import Twist, TwistStamped
-import cv_bridge
-import datetime
-
 import cv2
+import cv_bridge
+
+import sys
+import argparse
+import datetime
+from pathlib import Path
+
 
 
 class DataSaver():
-    def __init__(self):
-        self.pkg_path = self.get_package_path()
-        self.get_params()
+    def __init__(self, duration, video_topic, vel_topic, output_dir):
+        self.duration = duration
+        self.video_topic = video_topic
+        self.vel_topic = vel_topic
+        self.output_dir = output_dir
+
         self.bridge = cv_bridge.CvBridge()
         
         self.end_time = rospy.Time.now() + rospy.Duration.from_sec(self.duration)
        
+
         date = datetime.datetime.now()
         self.base_name = "%s%s%s%s%s-img" % (date.day, date.month, date.year, date.hour, date.minute)
-
-
-        self.path = self.pkg_path + "/" + self.output_dir + "/"
+        
+        self.path = "./" + self.output_dir
+        Path(self.path).mkdir(parents=True, exist_ok=True)
 
         self.label_file = open(self.path +  "labels.txt", "a+")
        
@@ -38,37 +45,32 @@ class DataSaver():
 
         rospy.loginfo("got")
         cv_img = self.bridge.imgmsg_to_cv2(data, desired_encoding="bgr8")
-        #cv2.imwrite(filename=self.base_name + str(self.counter) + ".jpg", img=cv_img, params=[cv2.IMWRITE_JPEG_QUALITY, 100])
+        #cv2.imwrite(filename=self.path + self.base_name + str(self.counter) + ".jpg", img=cv_img, params=[cv2.IMWRITE_JPEG_QUALITY, 100])
         self.counter += 1
         
 
     def vel_callback(self, data:TwistStamped):
         self.last_msg = data
 
-    def get_package_path(self):
-        packages = rospkg.get_ros_paths()
-        for package in packages:
-            if "leo_example_line_follower" in package:
-                rospy.loginfo("Found path")
-                return package
-        
-        rospy.logerr("Couldn't get path for leo_example_line_follower package")
-        exit(0)
-
-    def get_params(self):
-        self.duration = rospy.get_param("duration", 20.0)
-        self.video_topic = rospy.get_param("video_topic", "camera/image_raw")
-        self.vel_topic = rospy.get_param("velocity_topic", "cmd_vel")        
-        self.output_dir = rospy.get_param("output", "data")
 
 
 
-
-
+def add_arguments(parser: argparse.ArgumentParser):
+    parser.add_argument("duration", default=20.0, type=float, nargs="?", metavar="N", help="duration of recording the data")
+    parser.add_argument("-v", "--vid", default="camera/image_raw", type=str, required=False, dest="video_topic", help="name of the topic with view from robot")
+    parser.add_argument("-V", "--vel", default="cmd_vel", type=str, required=False, nargs="?", dest="vel_topic", help="name of the velocity topic")
+    parser.add_argument("-o", "--output", default="data", type=str, required=False, nargs="?", dest="output_dir", help="name of an output directory for saved images")
 
 
 if __name__ == "__main__":
     rospy.init_node("data_saver")
-    saver = DataSaver()
+
+    parser = argparse.ArgumentParser(description="Record video from rover as images.")
+    add_arguments(parser)
+   
+    rosargv = rospy.myargv(argv=sys.argv)
+    args = parser.parse_args(rosargv[1:])
+
+    saver = DataSaver(args.duration, args.video_topic, args.vel_topic, args.output_dir)
     rospy.spin()
     
