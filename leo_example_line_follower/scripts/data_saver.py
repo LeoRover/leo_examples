@@ -29,8 +29,10 @@ class DataSaver():
         self.base_name = "%s%s%s%s%s-img" % (date.day, date.month, date.year, date.hour, date.minute)
         
         self.path = "./" + self.output_dir
+        rospy.loginfo("Making directory for saved images (if it doesn't exist).")
         Path(self.path).mkdir(parents=True, exist_ok=True)
 
+        rospy.loginfo("Opening label file (creating if deons't exist).")
         self.label_file = open(self.path +  "/labels.txt", "a+")
        
         self.counter = 0
@@ -44,7 +46,7 @@ class DataSaver():
             rospy.loginfo("Saved enough data. Finishing node.")
             rospy.signal_shutdown("Saved enough data. Finishing node.")
 
-        rospy.loginfo("got")
+        
         cv_img = self.bridge.imgmsg_to_cv2(data, desired_encoding="bgr8")
         #cv2.imwrite(filename=self.path + self.base_name + str(self.counter) + ".jpg", img=cv_img, params=[cv2.IMWRITE_JPEG_QUALITY, 100])
         self.counter += 1
