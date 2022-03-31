@@ -31,7 +31,7 @@ class DataSaver():
         self.path = "./" + self.output_dir
         Path(self.path).mkdir(parents=True, exist_ok=True)
 
-        self.label_file = open(self.path +  "labels.txt", "a+")
+        self.label_file = open(self.path +  "/labels.txt", "a+")
        
         self.counter = 0
         
@@ -41,7 +41,8 @@ class DataSaver():
 
     def data_callback(self, data: Image):
         if self.end_time <= rospy.Time.now():
-            rospy.signal_shutdown("Saved enough data. Finnishing node")
+            rospy.loginfo("Saved enough data. Finishing node.")
+            rospy.signal_shutdown("Saved enough data. Finishing node.")
 
         rospy.loginfo("got")
         cv_img = self.bridge.imgmsg_to_cv2(data, desired_encoding="bgr8")
