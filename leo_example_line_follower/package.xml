@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>leo_example_line_follower</name>
+  <version>0.0.0</version>
+  <description>
+    Follow ARTag Example for Leo Rover.
+  </description>
+
+  <maintainer email="support@fictionlab.pl">Fictionlab</maintainer>
+  <author email="blazej@fictionlab.pl">Błażej Sowa</author>
+
+  <license>MIT</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>cv_bridge</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>rospkg</exec_depend>
+
+</package>

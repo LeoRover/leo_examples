@@ -1,0 +1,15 @@
+<launch>
+    <arg name="duration" default="20.0" />
+    <arg name="output_dir" default="data" />
+    <arg name="video_topic" default="img_raw" />
+    <arg name="vel_topic" default="cmd_vel" />
+    <arg name="color_mode" default="rgb" />
+
+    <node name="data_saver" pkg="leo_example_line_follower" type="data_saver.py" clear_params="true" output="screen">
+        <param name="duration" value="$(arg duration)"/>
+        <param name="output" value="$(arg output_dir)"/>
+        <param name="velocity_topic" value="$(arg vel_topic)"/>
+        <param name="video_topic" value="$(arg video_topic)"/>
+    </node>
+
+</launch>
