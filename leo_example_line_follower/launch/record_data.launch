@@ -1,14 +1,9 @@
 <launch>
-    <arg name="duration" default="20.0"/>
-    <arg name="output_dir" default="data"/>
-    <arg name="video_topic" default="img_raw"/>
-    <arg name="vel_topic" default="cmd_vel"/>
+    <arg name="duration" default="20.0" doc="how long will the data be recorded"/>
+    <arg name="output_dir" default="data" doc="name of the directory for recorded data"/>
+    <arg name="video_topic" default="camera/image_raw" doc="name of the topic with Image messages"/>
+    <arg name="vel_topic" default="cmd_vel" doc="name of the topic with Twist messages"/>
 
-    <node name="data_saver" pkg="leo_example_line_follower" type="data_saver.py" clear_params="true" output="screen">
-        <param name="duration" value="$(arg duration)"/>
-        <param name="output" value="$(arg output_dir)"/>
-        <param name="velocity_topic" value="$(arg vel_topic)"/>
-        <param name="video_topic" value="$(arg video_topic)"/>
-    </node>
+    <node name="data_saver" pkg="leo_example_line_follower" type="data_saver.py" clear_params="true" output="screen" args="$(arg duration) -c $(arg video_topic) -V $(arg vel_topic) -o $(arg output_dir)" />
 
 </launch>
