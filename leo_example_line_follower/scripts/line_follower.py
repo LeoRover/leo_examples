@@ -21,7 +21,7 @@ class LineFollower:
             self.interpreter = tflite.Interpreter(model_path=modelPath)
             self.interpreter.allocate_tensors()
         except ValueError as e:
-            rospy.logerr("Couldnt load tflite model")
+            rospy.logerr("Couldnt load tflite model: %s" % (modelPath))
             return
 
         self.get_params()
@@ -35,14 +35,14 @@ class LineFollower:
         self.video_sub = rospy.Subscriber(videoTopic, Image, self.video_callback)
 
     def get_params(self):
-        hue_min = rospy.get_param("hue_min", default=0)
-        hue_max = rospy.get_param("hue_max", default=179)
-        sat_min = rospy.get_param("sat_min", default=0)
-        sat_max = rospy.get_param("sat_max", default=255)
-        val_min = rospy.get_param("val_min", default=0)
-        val_max = rospy.get_param("val_max", default=255)
+        hue_min = rospy.get_param("~hue_min", default=0)
+        hue_max = rospy.get_param("~hue_max", default=179)
+        sat_min = rospy.get_param("~sat_min", default=0)
+        sat_max = rospy.get_param("~sat_max", default=255)
+        val_min = rospy.get_param("~val_min", default=0)
+        val_max = rospy.get_param("~val_max", default=255)
 
-        self.pub_mask = rospy.get_param("pub_mask", default=False)
+        self.pub_mask = rospy.get_param("~pub_mask", default=False)
 
         self.lower = (hue_min, sat_min, val_min)
         self.upper = (hue_max, sat_max, val_max)
