@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(leo_example_line_follower)
 
-find_package(catkin REQUIRED
+find_package(catkin REQUIRED COMPONENTS
   dynamic_reconfigure
 )
 
@@ -10,7 +10,10 @@ generate_dynamic_reconfigure_options(
   cfg/ColorMask.cfg
 )
 
-catkin_package()
+catkin_package(CATKIN_DEPENDS
+  dynamic_reconfigure
+)
+
 
 install(
   DIRECTORY 
