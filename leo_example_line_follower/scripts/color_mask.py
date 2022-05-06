@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import copy
 
 import rospy
 from sensor_msgs.msg import Image, CompressedImage
@@ -7,9 +8,6 @@ from leo_example_line_follower.cfg import ColorMaskConfig
 
 import cv2
 import cv_bridge
-
-import copy
-
 
 class ColorMask:
     color_mask_config = None
@@ -41,7 +39,7 @@ class ColorMask:
         cv_img = cv2.resize(cv_img, (160, 120))
 
         color_mask = self.get_mask(cv_img)
-        catched_colors = self.get_colors_from_mask(color_mask, cv_img)
+        catched_colors = get_colors_from_mask(color_mask, cv_img)
 
         self.publish_imgs(color_mask, catched_colors)
 
@@ -64,12 +62,6 @@ class ColorMask:
 
         return color_mask
 
-    def get_colors_from_mask(self, mask, img):
-        copy_img = copy.deepcopy(img)
-        catched_colors = cv2.bitwise_and(copy_img, copy_img, mask=mask)
-
-        return catched_colors
-
     def publish_imgs(self, mask, colors):
         mask_to_ros = self.bridge.cv2_to_imgmsg(mask, encoding="8UC1")
         colors_to_ros = self.bridge.cv2_to_compressed_imgmsg(colors)
@@ -86,6 +78,11 @@ class ColorMask:
         rospy.loginfo("val_min: %d" % (self.color_mask_config.val_min))
         rospy.loginfo("val_max: %d" % (self.color_mask_config.val_max))
 
+def get_colors_from_mask(mask, img):
+        copy_img = copy.deepcopy(img)
+        catched_colors = cv2.bitwise_and(copy_img, copy_img, mask=mask)
+
+        return catched_colors
 
 if __name__ == "__main__":
     rospy.init_node("color_mask_finder")
