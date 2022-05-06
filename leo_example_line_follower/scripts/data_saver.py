@@ -1,4 +1,10 @@
 #!/usr/bin/env python
+import sys
+import os
+import argparse
+import datetime
+from pathlib import Path
+import time
 
 import rospy
 from sensor_msgs.msg import Image
@@ -6,18 +12,9 @@ from geometry_msgs.msg import Twist
 import cv2
 import cv_bridge
 
-import sys
-import argparse
-import datetime
-from pathlib import Path
-
-
 class DataSaver:
     def __init__(self, duration, camera_topic, vel_topic, output_dir):
         self.duration = duration
-        self.camera_topic = camera_topic
-        self.vel_topic = vel_topic
-        self.output_dir = output_dir
 
         self.bridge = cv_bridge.CvBridge()
 
@@ -25,7 +22,7 @@ class DataSaver:
         self.end_time = 0
 
         rospy.loginfo("Making directory for saved images (if it doesn't exist).")
-        self.path = "./" + self.output_dir
+        self.path = "./" + output_dir
         Path(self.path).mkdir(parents=True, exist_ok=True)
 
         date = datetime.datetime.now()
@@ -39,19 +36,19 @@ class DataSaver:
         )
 
         rospy.loginfo("Opening label file (creating if doesn't exist).")
-        self.label_file = open(self.path + "/" + self.output_dir + "-labels.txt", "a+")
+        self.label_file = open(os.path.join(self.path, self.output_dir+"-labels.txt"), "a+")
 
         self.counter = 0
 
-        self.video_sub = rospy.Subscriber(self.camera_topic, Image, self.data_callback)
-        self.vel_sub = rospy.Subscriber(self.vel_topic, Twist, self.vel_callback)
+        self.video_sub = rospy.Subscriber(camera_topic, Image, self.data_callback)
+        self.vel_sub = rospy.Subscriber(vel_topic, Twist, self.vel_callback)
 
     def data_callback(self, data: Image):
         if not self.ready:
             rospy.loginfo("Wating for twist msg.")
             return
 
-        if self.end_time <= rospy.Time.now():
+        if self.end_time <= time.monotonic():
             rospy.loginfo("Saved enough data. Finishing node.")
             self.label_file.close()
             rospy.signal_shutdown("Saved enough data. Finishing node.")
@@ -71,7 +68,7 @@ class DataSaver:
     def vel_callback(self, data: Twist):
         if not self.ready:
             self.ready = True
-            self.end_time = rospy.Time.now() + rospy.Duration.from_sec(self.duration)
+            self.end_time = time.monotonic() + self.duration
         self.label = (round(data.linear.x, 2), round(data.angular.z, 2))
 
 
