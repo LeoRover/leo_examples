@@ -1,0 +1,6 @@
+hue_min: 90
+hue_max: 116
+sat_min: 44
+sat_max: 255
+val_min: 68
+val_max: 255
