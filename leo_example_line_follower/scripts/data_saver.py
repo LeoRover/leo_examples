@@ -22,7 +22,7 @@ class DataSaver:
         self.end_time = 0
 
         rospy.loginfo("Making directory for saved images (if it doesn't exist).")
-        self.path = "./" + output_dir
+        self.path = output_dir
         Path(self.path).mkdir(parents=True, exist_ok=True)
 
         date = datetime.datetime.now()

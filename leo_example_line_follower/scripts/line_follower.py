@@ -1,19 +1,23 @@
 #!/usr/bin/env python
+from re import S
+import sys
+import argparse
 
 import rospy
 from sensor_msgs.msg import Image
 from geometry_msgs.msg import Twist
+from dynamic_reconfigure.server import Server
+from leo_example_line_follower.cfg import ColorMaskConfig
 import cv2
 import cv_bridge
-
-import sys
-import argparse
 
 import tflite_runtime.interpreter as tflite
 import numpy as np
 
 
 class LineFollower:
+    color_mask_config = None
+
     def __init__(self, modelPath=None, velocityTopic=None, videoTopic=None):
         self.bridge = cv_bridge.CvBridge()
 
@@ -24,40 +28,95 @@ class LineFollower:
             rospy.logerr("Couldnt load tflite model: %s" % (modelPath))
             return
 
-        self.get_params()
+        self.mask_func = self.simple_mask
+        
+        self.srv = Server(ColorMaskConfig, self.param_callback)
+
+        self.pub_mask = rospy.get_param("~pub_mask", default=False)
 
         self.vel_pub = rospy.Publisher(velocityTopic, Twist, queue_size=10)
-        
+
         self.mask_pub = None
         if self.pub_mask:
             self.mask_pub = rospy.Publisher("color_mask", Image, queue_size=1)
 
         self.video_sub = rospy.Subscriber(videoTopic, Image, self.video_callback)
 
-    def get_params(self):
-        hue_min = rospy.get_param("~hue_min", default=0)
-        hue_max = rospy.get_param("~hue_max", default=179)
-        sat_min = rospy.get_param("~sat_min", default=0)
-        sat_max = rospy.get_param("~sat_max", default=255)
-        val_min = rospy.get_param("~val_min", default=0)
-        val_max = rospy.get_param("~val_max", default=255)
+    def simple_mask(self, img):
+        color_mask = cv2.inRange(
+            img,
+            (
+                self.color_mask_config.hue_min,
+                self.color_mask_config.sat_min,
+                self.color_mask_config.val_min,
+            ),
+            (
+                self.color_mask_config.hue_max,
+                self.color_mask_config.sat_max,
+                self.color_mask_config.val_max,
+            ),
+        )
+        return color_mask
 
-        self.pub_mask = rospy.get_param("~pub_mask", default=False)
+    def double_range_mask(self, img):
+        # hue_min > hue_max, so there are two masks:
+        # 1) 0-hue_max
+        # 2) hue_min - 180
+        lower_mask = cv2.inRange(
+            img,
+            (
+                0,
+                self.color_mask_config.sat_min,
+                self.color_mask_config.val_min,
+            ),
+            (
+                self.color_mask_config.hue_max,
+                self.color_mask_config.sat_max,
+                self.color_mask_config.val_max,
+            ),
+        )
 
-        self.lower = (hue_min, sat_min, val_min)
-        self.upper = (hue_max, sat_max, val_max)
+        upper_mask = cv2.inRange(
+            img,
+            (
+                self.color_mask_config.hue_min,
+                self.color_mask_config.sat_min,
+                self.color_mask_config.val_min,
+            ),
+            (
+                179,
+                self.color_mask_config.sat_max,
+                self.color_mask_config.val_max,
+            ),
+        )
+
+        final_mask = lower_mask + upper_mask
+
+        return final_mask
+    
+    
+    def param_callback(self, config, level):
+        self.color_mask_config = config
+        self.mask_func = (
+            self.simple_mask
+            if config.hue_min < config.hue_max
+            else self.double_range_mask
+        )
+
+
+        return config
 
     def video_callback(self, data: Image):
         cv_img = self.bridge.imgmsg_to_cv2(data, desired_encoding="bgr8")
         processed_img = self.preprocess_img(cv_img)
 
         steering = self.get_steering(processed_img)
-        
+
         if self.pub_mask:
             self.publish_mask(processed_img)
 
         rospy.logdebug("steering: %f, %f" % (steering[0], steering[1]))
-        
+
         self.publish_vel(steering)
 
     def publish_vel(self, steering):
@@ -81,12 +140,12 @@ class LineFollower:
         self.interpreter.set_tensor(input_details[0]["index"], [img])
         # running interferance
         self.interpreter.invoke()
-        
+
         # getting answer
         linear_x = self.interpreter.get_tensor(output_details[0]["index"])[0][0]
         angular_z = self.interpreter.get_tensor(output_details[1]["index"])[0][0]
         rospy.logdebug("pred = (%f, %f)" % (linear_x, angular_z))
-        
+
         return linear_x, angular_z
 
     def preprocess_img(self, img):
@@ -95,9 +154,9 @@ class LineFollower:
         # cropping img
         crop_img = hsv_img[200 : hsv_img.shape[0], :]
         # getting color mask
-        blue_color = cv2.inRange(crop_img, self.lower, self.upper)
+        color_mask = self.mask_func(crop_img)
         # converting int balues to float
-        float_img = blue_color.astype(np.float32)
+        float_img = color_mask.astype(np.float32)
         # resizing
         resized_img = cv2.resize(float_img, (160, 120))
         # normalize
