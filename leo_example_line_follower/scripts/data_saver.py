@@ -26,7 +26,7 @@ class DataSaver:
         Path(self.path).mkdir(parents=True, exist_ok=True)
 
         date = datetime.datetime.now()
-        self.img_dir = self.path + "/"
+        #self.img_dir = output_dir + "/"
         self.img_base_name = "%s%s%s%s%s-img" % (
             date.day,
             date.month,
@@ -36,7 +36,7 @@ class DataSaver:
         )
 
         rospy.loginfo("Opening label file (creating if doesn't exist).")
-        self.label_file = open(os.path.join(self.path, self.output_dir+"-labels.txt"), "a+")
+        self.label_file = open(os.path.join(self.path, "labels.txt"), "a+")
 
         self.counter = 0
 
@@ -58,7 +58,7 @@ class DataSaver:
             img_name = self.img_base_name + str(self.counter) + ".jpg"
 
             cv2.imwrite(
-                filename=self.img_dir + img_name,
+                filename=os.path.join(self.path, img_name),
                 img=cv_img,
                 params=[cv2.IMWRITE_JPEG_QUALITY, 100],
             )
