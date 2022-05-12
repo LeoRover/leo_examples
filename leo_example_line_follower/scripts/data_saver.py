@@ -22,7 +22,12 @@ class DataSaver:
         self.end_time = 0
 
         rospy.loginfo("Making directory for saved images (if it doesn't exist).")
-        self.path = output_dir
+        
+        if output_dir[0] != "/":
+            self.path = os.path.join("/home/pi", output_dir)
+        else:
+            self.path = output_dir
+
         Path(self.path).mkdir(parents=True, exist_ok=True)
 
         date = datetime.datetime.now()
