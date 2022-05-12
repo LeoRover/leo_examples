@@ -21,7 +21,7 @@ class DataProcessor:
 
         for path in paths:
             print("processing %s/labels.txt" % (path))
-            file = open(os.join(path, "labels.txt"), "r")
+            file = open(os.path.join(path, "labels.txt"), "r")
             lines = file.readlines()
 
             for line in lines:
@@ -37,7 +37,7 @@ class DataProcessor:
                 os.rename(os.path.join(path, photo), os.path.join(self.final_dir, photo))
 
             file.close()
-            os.remove(os.join(path, "labels.txt"))
+            os.remove(os.path.join(path, "labels.txt"))
             os.rmdir(path)
 
         with open("labels.pickle", "wb") as handle:
