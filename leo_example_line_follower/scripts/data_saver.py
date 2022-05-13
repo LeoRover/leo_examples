@@ -24,7 +24,7 @@ class DataSaver:
         rospy.loginfo("Making directory for saved images (if it doesn't exist).")
         
         if output_dir[0] != "/":
-            self.path = os.path.join("/home/pi", output_dir)
+            self.path = os.path.join(Path.home(), output_dir)
         else:
             self.path = output_dir
 
