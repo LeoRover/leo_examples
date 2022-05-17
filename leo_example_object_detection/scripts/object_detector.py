@@ -23,8 +23,10 @@ class ObjectDetector:
         try:
             self.interpreter = tflite.Interpreter(model_path=modelPath)
             input_details = self.interpreter.get_input_details()
-            self.input_shape = input_details[0]["shape"][1:3].tolist()
+            self.input_shape = tuple(input_details[0]["shape"][1:3].tolist())
             self.interpreter.allocate_tensors()
+            rospy.loginfo(self.input_shape)
+            rospy.loginfo(input_details)
         except ValueError as e:
             rospy.logerr("Couldnt load tflite model: %s" % (modelPath))
             return
@@ -96,12 +98,12 @@ class ObjectDetector:
                 bottom = int(box[2] * 300)
                 right = int(box[3] * 300)
 
+                text = self.labels[int(label)] + " " + str(round(conf * 100, 2)) + "%"
+
                 # border around the detection
                 img = cv2.rectangle(img, (left, top), (right, bottom), (0, 0, 255), 2)
 
-                text_size, _ = cv2.getTextSize(
-                    self.labels[int(label)], cv2.FONT_HERSHEY_COMPLEX, 0.5, 1 
-                )
+                text_size, _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_COMPLEX, 0.5, 1)
 
                 text_w, text_h = text_size
                 # border behind label
@@ -115,7 +117,7 @@ class ObjectDetector:
 
                 img = cv2.putText(
                     img,
-                    self.labels[int(label)],
+                    text,
                     (left, top + text_h - 1),
                     cv2.FONT_HERSHEY_COMPLEX,
                     0.5,
