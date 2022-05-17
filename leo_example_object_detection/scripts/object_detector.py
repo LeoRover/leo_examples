@@ -25,8 +25,6 @@ class ObjectDetector:
             input_details = self.interpreter.get_input_details()
             self.input_shape = tuple(input_details[0]["shape"][1:3].tolist())
             self.interpreter.allocate_tensors()
-            rospy.loginfo(self.input_shape)
-            rospy.loginfo(input_details)
         except ValueError as e:
             rospy.logerr("Couldnt load tflite model: %s" % (modelPath))
             return
