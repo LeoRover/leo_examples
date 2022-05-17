@@ -22,6 +22,8 @@ class ObjectDetector:
 
         try:
             self.interpreter = tflite.Interpreter(model_path=modelPath)
+            input_details = self.interpreter.get_input_details()
+            self.input_shape = input_details[0]["shape"][1:3].tolist()
             self.interpreter.allocate_tensors()
         except ValueError as e:
             rospy.logerr("Couldnt load tflite model: %s" % (modelPath))
@@ -59,14 +61,13 @@ class ObjectDetector:
         try:
             msg = self.bridge.cv2_to_compressed_imgmsg(detections)
             self.detection_pub.publish(msg)
-            rospy.loginfo("published")
         except cv_bridge.CvBridgeError() as e:
-            rospy.logerror("duppa")
+            rospy.logerror(e)
 
     def preprocess(self, img):
         cpy = copy.deepcopy(img)
         rgb = cv2.cvtColor(cpy, cv2.COLOR_BGR2RGB)
-        resized = cv2.resize(rgb, (300, 300))
+        resized = cv2.resize(rgb, self.input_shape)
 
         return resized
 
