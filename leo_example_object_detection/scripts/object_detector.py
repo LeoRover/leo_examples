@@ -30,8 +30,9 @@ class ObjectDetector:
             return
 
         self.read_labels(labels_file)
+        self.build_color_dict()
 
-        self.srv = Server(ConfidenceConfig, self.param_callback)
+        self.srv = Server(ConfidenceConfig, self.dynamic_param_callback)
 
         self.detection_pub = rospy.Publisher(
             "detections/compressed", CompressedImage, queue_size=10
@@ -50,7 +51,15 @@ class ObjectDetector:
             for line in lines:
                 self.labels.append(line.strip())
 
-    def param_callback(self, config, level):
+    def build_color_dict(self):
+        self.label_colors = dict()
+        labels = rospy.get_param("~labels")
+        colors = rospy.get_param("~colors")
+
+        for label, color in zip(labels, colors):
+            self.label_colors[label] = tuple(color)
+
+    def dynamic_param_callback(self, config, level):
         self.confidence_cfg = config
         return config
 
@@ -96,10 +105,13 @@ class ObjectDetector:
                 bottom = int(box[2] * 300)
                 right = int(box[3] * 300)
 
+                color = self.label_colors.get(self.labels[int(label)], (0, 0, 102))
+
+
                 text = self.labels[int(label)] + " " + str(round(conf * 100, 2)) + "%"
 
                 # border around the detection
-                img = cv2.rectangle(img, (left, top), (right, bottom), (0, 0, 255), 2)
+                img = cv2.rectangle(img, (left, top), (right, bottom), color, 2)
 
                 text_size, _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_COMPLEX, 0.5, 1)
 
@@ -109,7 +121,7 @@ class ObjectDetector:
                     img,
                     (left, top + 2),
                     (left + text_w, top + 2 + text_h),
-                    (0, 0, 255),
+                    color,
                     -1,
                 )
 

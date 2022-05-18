@@ -4,5 +4,7 @@
     <arg name="camera" default="camera/image_raw" doc="name of topic with Image messages"/>
     <arg name="model" default="$(find leo_example_object_detection)/models/ssd_mobilenet_v1_1_metadata_1.tflite" doc="path to neural network model"/>
 
-    <node name="object_detector" pkg="leo_example_object_detection" type="object_detector.py" clear_params="true" output="screen" args="-p $(arg model) -c $(arg camera) -l $(arg labels)"/>
+    <node name="object_detector" pkg="leo_example_object_detection" type="object_detector.py" clear_params="true" output="screen" args="-p $(arg model) -c $(arg camera) -l $(arg labels)">
+        <rosparam command="load" file="$(find leo_example_object_detection)/config/label_colors.yaml"/>
+    </node>
 </launch>
