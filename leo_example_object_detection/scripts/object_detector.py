@@ -90,7 +90,7 @@ class ObjectDetector:
         return config
 
     def video_callback(self, data: Image):
-        cv_img = self.bridge.imgmsg_to_cv2(data, desired_encoding="rgb8")
+        cv_img = self.bridge.imgmsg_to_cv2(data, desired_encoding="passthrough")
         if not self.scales:
             self.get_scales(cv_img)
 
@@ -154,7 +154,7 @@ class ObjectDetector:
             # main border
             img = cv2.rectangle(img, start, end, color, 2)
 
-            text_size, _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_COMPLEX, 0.5, 1)
+            text_size, _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_COMPLEX, 1, 1)
             text_w, text_h = text_size
 
             # text background
@@ -171,7 +171,7 @@ class ObjectDetector:
                 text,
                 (start[0], start[1] + text_h - 1),
                 cv2.FONT_HERSHEY_COMPLEX,
-                0.5,
+                1,
                 (255, 255, 255),
                 1,
             )
