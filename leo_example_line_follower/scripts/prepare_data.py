@@ -39,7 +39,19 @@ class DataProcessor:
 
             file.close()
             os.remove(os.path.join(path, "labels.txt"))
-            os.rmdir(path)
+            
+            dir_names = path.split("/")
+            while len(dir_names) > 0:
+                dir_path = os.path.join(*dir_names)
+                if len(os.listdir(dir_path)) == 0:
+                    # directory empty, we can delete it
+                    print("removing %s directory" % (dir_path))
+                    os.rmdir(dir_path)
+                    dir_names.pop()
+                else:
+                    # directory not empty
+                    break
+
 
         with open("labels.pickle", "wb") as handle:
             pickle.dump(labels, handle, pickle.DEFAULT_PROTOCOL)
