@@ -31,6 +31,7 @@ class ObjectDetector:
 
         self.read_labels(labels_file)
         self.build_color_dict()
+        self.scales = False
 
         self.srv = Server(ConfidenceConfig, self.dynamic_param_callback)
 
@@ -43,6 +44,31 @@ class ObjectDetector:
         )
 
         rospy.loginfo("Starting node")
+
+    def get_scales(self, img):
+        copy_img = copy.deepcopy(img)
+        self.final_height = copy_img.shape[0]
+        self.final_width = copy_img.shape[1]
+
+        self.scale_x = self.final_width / self.input_shape[0]
+        self.scale_y = self.final_height / self.input_shape[1]
+
+        self.x_original_center = (self.input_shape[0] - 1) / 2
+        self.y_original_center = (self.input_shape[1] - 1) / 2
+
+        self.x_final_center = (self.final_width - 1) / 2
+        self.y_final_center = (self.final_height - 1) / 2
+
+        self.scales = True
+
+    def translate_point(self, point):
+        x_translated = (
+            point[0] - self.x_original_center
+        ) * self.scale_x + self.x_final_center
+        y_translated = (
+            point[1] - self.y_original_center
+        ) * self.scale_y + self.y_final_center
+        return (int(x_translated), int(y_translated))
 
     def read_labels(self, file):
         self.labels = []
@@ -65,10 +91,16 @@ class ObjectDetector:
 
     def video_callback(self, data: Image):
         cv_img = self.bridge.imgmsg_to_cv2(data, desired_encoding="rgb8")
+        if not self.scales:
+            self.get_scales(cv_img)
+
         processed_img = self.preprocess(cv_img)
-        detections = self.detect_objects(processed_img)
+        boxes, labels, confidences = self.detect_objects(processed_img)
+        final_boxes = self.get_boxes(boxes, labels, confidences)
+        final_img = self.draw_detections(cv_img, final_boxes)
+
         try:
-            msg = self.bridge.cv2_to_compressed_imgmsg(detections)
+            msg = self.bridge.cv2_to_compressed_imgmsg(final_img)
             self.detection_pub.publish(msg)
         except cv_bridge.CvBridgeError() as e:
             rospy.logerror(e)
@@ -94,46 +126,55 @@ class ObjectDetector:
         boxes = self.interpreter.get_tensor(output_details[0]["index"])[0]
         labels = self.interpreter.get_tensor(output_details[1]["index"])[0]
         confidence = self.interpreter.get_tensor(output_details[2]["index"])[0]
-        img = self.draw_detections(img, boxes, labels, confidence)
-        return img
+        # img = self.draw_detections(img, boxes, labels, confidence)
+        return boxes, labels, confidence
 
-    def draw_detections(self, img, boxes, labels, confidence):
+    def get_boxes(self, boxes, labels, confidence):
+        final_boxes = []
         for box, label, conf in zip(boxes, labels, confidence):
             if int(conf * 100) - self.confidence_cfg.confidence > 0:
-                top = int(box[0] * 300)
-                left = int(box[1] * 300)
-                bottom = int(box[2] * 300)
-                right = int(box[3] * 300)
+                top = int(box[0] * self.input_shape[1])
+                left = int(box[1] * self.input_shape[0])
+                bottom = int(box[2] * self.input_shape[1])
+                right = int(box[3] * self.input_shape[0])
 
                 color = self.label_colors.get(self.labels[int(label)], (0, 0, 102))
 
-
                 text = self.labels[int(label)] + " " + str(round(conf * 100, 2)) + "%"
 
-                # border around the detection
-                img = cv2.rectangle(img, (left, top), (right, bottom), color, 2)
+                final_start_point = self.translate_point((left, top))
+                final_end_point = self.translate_point((right, bottom))
 
-                text_size, _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_COMPLEX, 0.5, 1)
+                final_boxes.append((final_start_point, final_end_point, text, color))
 
-                text_w, text_h = text_size
-                # border behind label
-                cv2.rectangle(
-                    img,
-                    (left, top + 2),
-                    (left + text_w, top + 2 + text_h),
-                    color,
-                    -1,
-                )
+        return final_boxes
 
-                img = cv2.putText(
-                    img,
-                    text,
-                    (left, top + text_h - 1),
-                    cv2.FONT_HERSHEY_COMPLEX,
-                    0.5,
-                    (255, 255, 255),
-                    1,
-                )
+    def draw_detections(self, img, final_boxes):
+        for start, end, text, color in final_boxes:
+            # main border
+            img = cv2.rectangle(img, start, end, color, 2)
+
+            text_size, _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_COMPLEX, 0.5, 1)
+            text_w, text_h = text_size
+
+            # text background
+            cv2.rectangle(
+                img,
+                (start[0], start[1] + 2),
+                (start[0] + text_w, start[1] + 2 + text_h),
+                color,
+                -1,
+            )
+
+            img = cv2.putText(
+                img,
+                text,
+                (start[0], start[1] + text_h - 1),
+                cv2.FONT_HERSHEY_COMPLEX,
+                0.5,
+                (255, 255, 255),
+                1,
+            )
 
         return img
 
