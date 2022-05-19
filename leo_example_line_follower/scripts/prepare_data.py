@@ -28,22 +28,27 @@ class DataProcessor:
         try:
             zipObj = ZipFile(self.zip_file, "x")
         except FileExistsError as e:
-            print("Given zip file already exist. Pick different name, or move the zip file")
+            print("Given zip file already exist. Pick different name, or move the zip file.")
             shutil.rmtree("data")
             os.remove("partition.pickle")
             os.remove("labels.pickle")
             return
 
+        print("Created %s file" % (self.zip_file))
+
         zipObj.write("partition.pickle")
+        print("Zipped 'partition.pickle' file.")
         zipObj.write("labels.pickle")
+        print("Zipped 'labels.pickle' file.")
 
         images = os.listdir("data")
-
+        
         for img in images:
             zipObj.write(os.path.join("data", img))
-
+        print("Zipped 'data' directory.")
         zipObj.close()
 
+        print("Zip archive ready, removing temp files.")
         shutil.rmtree("data")
         os.remove("partition.pickle")
         os.remove("labels.pickle")
