@@ -4,7 +4,8 @@ from pathlib import Path
 import pickle
 import sys
 import argparse
-
+import shutil
+from zipfile import ZipFile
 
 class DataProcessor:
     def __init__(self, train, valid, final_dir):
@@ -15,7 +16,7 @@ class DataProcessor:
         Path(self.final_dir).mkdir(parents=True, exist_ok=True)
 
         self.process_data(self.training_paths + self.validation_paths)
-
+    
     def process_data(self, paths):
         labels = {"linear": {}, "angular": {}}
         partition = {"validation": [], "train": []}
@@ -35,23 +36,8 @@ class DataProcessor:
                 else:
                     partition["train"].append(photo)
 
-                os.rename(os.path.join(path, photo), os.path.join(self.final_dir, photo))
-
+                shutil.copy(os.path.join(path, photo), os.path.join(self.final_dir, photo))
             file.close()
-            os.remove(os.path.join(path, "labels.txt"))
-            
-            dir_names = path.split("/")
-            while len(dir_names) > 0:
-                dir_path = os.path.join(*dir_names)
-                if len(os.listdir(dir_path)) == 0:
-                    # directory empty, we can delete it
-                    print("removing %s directory" % (dir_path))
-                    os.rmdir(dir_path)
-                    dir_names.pop()
-                else:
-                    # directory not empty
-                    break
-
 
         with open("labels.pickle", "wb") as handle:
             pickle.dump(labels, handle, pickle.DEFAULT_PROTOCOL)
