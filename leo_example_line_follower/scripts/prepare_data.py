@@ -8,14 +8,45 @@ import shutil
 from zipfile import ZipFile
 
 class DataProcessor:
-    def __init__(self, train, valid, final_dir):
+    def __init__(self, train, valid, zip_file):
         self.training_paths = train
         self.validation_paths = valid
-        self.final_dir = final_dir
+        self.zip_file = zip_file
 
-        Path(self.final_dir).mkdir(parents=True, exist_ok=True)
-
+        try:
+            Path("data").mkdir(parents=True)
+        except FileExistsError as e:
+            print("'data' directory exist in the working directory already. Can't process images.")
+            return
+        
         self.process_data(self.training_paths + self.validation_paths)
+        self.make_zip_archive()
+
+
+    def make_zip_archive(self):
+        zipObj = None
+        try:
+            zipObj = ZipFile(self.zip_file, "x")
+        except FileExistsError as e:
+            print("Given zip file already exist. Pick different name, or move the zip file")
+            shutil.rmtree("data")
+            os.remove("partition.pickle")
+            os.remove("labels.pickle")
+            return
+
+        zipObj.write("partition.pickle")
+        zipObj.write("labels.pickle")
+
+        images = os.listdir("data")
+
+        for img in images:
+            zipObj.write(os.path.join("data", img))
+
+        zipObj.close()
+
+        shutil.rmtree("data")
+        os.remove("partition.pickle")
+        os.remove("labels.pickle")
     
     def process_data(self, paths):
         labels = {"linear": {}, "angular": {}}
@@ -36,7 +67,7 @@ class DataProcessor:
                 else:
                     partition["train"].append(photo)
 
-                shutil.copy(os.path.join(path, photo), os.path.join(self.final_dir, photo))
+                shutil.copy(os.path.join(path, photo), os.path.join("data", photo))
             file.close()
 
         with open("labels.pickle", "wb") as handle:
@@ -81,16 +112,16 @@ if __name__ == "__main__":
         dest="valid",
     )
     parser.add_argument(
-        "-f",
-        "--final",
+        "-z",
+        "--zip_file",
         nargs="?",
         type=str,
         metavar="path",
-        help="path to final directiory with data",
-        dest="final",
-        default="./data",
+        help="name of the zip archive with dataset",
+        dest="zip",
+        default="my_dataset.zip",
     )
 
     args = parser.parse_args(sys.argv[1:])
 
-    data_processor = DataProcessor(args.train, args.valid, args.final)
+    data_processor = DataProcessor(args.train, args.valid, args.zip)
