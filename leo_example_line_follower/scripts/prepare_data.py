@@ -98,7 +98,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Prepare dataset for neural network")
     parser.add_argument(
         "-t",
-        "--train-data",
+        "--train_data",
         nargs="+",
         type=str,
         required=True,
