@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(leo_example_follow_ar_tag)
 
-find_package(catkin)
+find_package(catkin REQUIRED)
 
 catkin_package()
 

@@ -1,10 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import math
 
 import rospy
 
-from geometry_msgs.msg import Twist, TwistStamped, Vector3
+from geometry_msgs.msg import Twist, Vector3
+from nav_msgs.msg import Odometry
 from ar_track_alvar_msgs.msg import AlvarMarkers
 
 
@@ -43,7 +44,10 @@ class ARTagFollower:
             "ar_pose_marker", AlvarMarkers, self.callback_ar_pose, queue_size=1
         )
         self.wheel_odom_sub = rospy.Subscriber(
-            "wheel_odom", TwistStamped, self.callback_wheel_odom, queue_size=1
+            "wheel_odom_with_covariance",
+            Odometry,
+            self.callback_wheel_odom,
+            queue_size=1,
         )
 
     def get_parameters(self):
@@ -156,12 +160,12 @@ class ARTagFollower:
             step_duration = (end_ts - start_ts).to_sec()
 
             # Integrate the velocity using rectangular rule
-            self.odom_yaw += msg.twist.angular.z * step_duration
+            self.odom_yaw += msg.twist.twist.angular.z * step_duration
             self.odom_position.x += (
-                msg.twist.linear.x * math.cos(self.odom_yaw) * step_duration
+                msg.twist.twist.linear.x * math.cos(self.odom_yaw) * step_duration
             )
             self.odom_position.y += (
-                msg.twist.linear.x * math.sin(self.odom_yaw) * step_duration
+                msg.twist.twist.linear.x * math.sin(self.odom_yaw) * step_duration
             )
 
             self.update_marker_angle_distance()
