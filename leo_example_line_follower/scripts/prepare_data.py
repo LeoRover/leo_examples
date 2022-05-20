@@ -7,6 +7,7 @@ import argparse
 import shutil
 from zipfile import ZipFile
 
+
 class DataProcessor:
     def __init__(self, train, valid, zip_file):
         self.training_paths = train
@@ -19,19 +20,22 @@ class DataProcessor:
         try:
             Path("data").mkdir(parents=True)
         except FileExistsError as e:
-            print("'data' directory exist in the working directory already. Can't process images.")
+            print(
+                "'data' directory exist in the working directory already. Can't process images."
+            )
             return
-        
+
         self.process_data(self.training_paths + self.validation_paths)
         self.make_zip_archive()
-
 
     def make_zip_archive(self):
         zipObj = None
         try:
             zipObj = ZipFile(self.zip_file, "x")
         except FileExistsError as e:
-            print("Given zip file already exist. Pick different name, or move the zip file.")
+            print(
+                "Given zip file already exist. Pick different name, or move the zip file."
+            )
             shutil.rmtree("data")
             os.remove("partition.pickle")
             os.remove("labels.pickle")
@@ -45,7 +49,7 @@ class DataProcessor:
         print("Zipped 'labels.pickle' file.")
 
         images = os.listdir("data")
-        
+
         for img in images:
             zipObj.write(os.path.join("data", img))
         print("Zipped 'data' directory.")
@@ -55,7 +59,7 @@ class DataProcessor:
         shutil.rmtree("data")
         os.remove("partition.pickle")
         os.remove("labels.pickle")
-    
+
     def process_data(self, paths):
         labels = {"linear": {}, "angular": {}}
         partition = {"validation": [], "train": []}
