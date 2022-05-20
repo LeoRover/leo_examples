@@ -27,5 +27,6 @@ catkin_install_python(
   PROGRAMS scripts/data_saver.py
            scripts/line_follower.py
            scripts/color_mask.py
+           scripts/prepare_data.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
