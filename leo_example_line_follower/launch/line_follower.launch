@@ -7,7 +7,7 @@
     <arg name="model" default="$(find leo_example_line_follower)/models/color_mask_model.tflite" doc="path to neural network model"/>
 
     <node name="line_follower" pkg="leo_example_line_follower" type="line_follower.py" clear_params="true" output="screen" args="-p $(arg model) -c $(arg camera) -v $(arg vel)">
-        <rosparam command="load" file="$(arg yaml_file)" />
+        <rosparam command="load" file="$(arg color_mask_file)" />
         <param name="pub_mask" value="$(arg pub_mask)" />
     </node>
 
