@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import copy
 import sys
 import argparse
@@ -26,8 +26,8 @@ class ObjectDetector:
             self.input_shape = tuple(input_details[0]["shape"][1:3].tolist())
             self.interpreter.allocate_tensors()
         except ValueError as e:
-            rospy.logerr("Couldnt load tflite model: %s" % (modelPath))
-            return
+            rospy.logerr("Could not load tflite model: %s" % (modelPath))
+            raise ValueError("Model not loaded")
 
         self.read_labels(labels_file)
         self.build_color_dict()
@@ -46,9 +46,8 @@ class ObjectDetector:
         rospy.loginfo("Starting node")
 
     def get_scales(self, img):
-        copy_img = copy.deepcopy(img)
-        self.final_height = copy_img.shape[0]
-        self.final_width = copy_img.shape[1]
+        self.final_height = img.shape[0]
+        self.final_width = img.shape[1]
 
         self.scale_x = self.final_width / self.input_shape[0]
         self.scale_y = self.final_height / self.input_shape[1]
