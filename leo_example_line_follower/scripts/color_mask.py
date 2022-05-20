@@ -27,7 +27,7 @@ class ColorMask:
         )
 
         self.video_sub = rospy.Subscriber(
-            "/camera/image_raw", Image, self.video_callback
+            "camera/image_raw", Image, self.video_callback
         )
 
         rospy.loginfo("Starting color_mask_finder node")

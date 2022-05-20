@@ -1,6 +1,6 @@
 <launch>
-    <arg name="yaml_file" default="$(find leo_example_line_follower)/config/color_mask.yaml" doc="path to yaml file with color mask values"/>
-    <arg name="pub_mask" default="false" doc="flag specyfing whether or not publish the color mask"/>
+    <arg name="color_mask_file" default="$(find leo_example_line_follower)/config/blue.yaml" doc="path to yaml file with color mask values"/>
+    <arg name="pub_mask" default="false" doc="flag specifying whether or not publish the color mask"/>
 
     <arg name="camera" default="camera/image_raw" doc="name of topic with Image messages"/>
     <arg name="vel" default="cmd_vel" doc="name of topic to which node will publish Twist messages"/>
