@@ -1,0 +1,14 @@
+<launch>
+    <arg name="color_mask_file" default="$(find leo_example_line_follower)/config/blue.yaml" doc="path to yaml file with color mask values"/>
+    <arg name="pub_mask" default="false" doc="flag specifying whether or not publish the color mask"/>
+
+    <arg name="camera" default="camera/image_raw" doc="name of topic with Image messages"/>
+    <arg name="vel" default="cmd_vel" doc="name of topic to which node will publish Twist messages"/>
+    <arg name="model" default="$(find leo_example_line_follower)/models/color_mask_model.tflite" doc="path to neural network model"/>
+
+    <node name="line_follower" pkg="leo_example_line_follower" type="line_follower.py" clear_params="true" output="screen" args="-p $(arg model) -c $(arg camera) -v $(arg vel)">
+        <rosparam command="load" file="$(arg color_mask_file)" />
+        <param name="pub_mask" value="$(arg pub_mask)" />
+    </node>
+
+</launch>
