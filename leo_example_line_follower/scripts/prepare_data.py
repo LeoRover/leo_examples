@@ -13,6 +13,9 @@ class DataProcessor:
         self.validation_paths = valid
         self.zip_file = zip_file
 
+        if not zip_file.endswith(".zip"):
+            self.zip_file += ".zip"
+
         try:
             Path("data").mkdir(parents=True)
         except FileExistsError as e:
