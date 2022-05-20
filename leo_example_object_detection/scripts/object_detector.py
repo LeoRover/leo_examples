@@ -53,21 +53,12 @@ class ObjectDetector:
         self.scale_x = self.final_width / self.input_shape[0]
         self.scale_y = self.final_height / self.input_shape[1]
 
-        self.x_original_center = (self.input_shape[0] - 1) / 2
-        self.y_original_center = (self.input_shape[1] - 1) / 2
-
-        self.x_final_center = (self.final_width - 1) / 2
-        self.y_final_center = (self.final_height - 1) / 2
-
         self.scales = True
 
     def translate_point(self, point):
-        x_translated = (
-            point[0] - self.x_original_center
-        ) * self.scale_x + self.x_final_center
-        y_translated = (
-            point[1] - self.y_original_center
-        ) * self.scale_y + self.y_final_center
+        x_translated = point[0] * self.scale_x
+        y_translated = point[1] * self.scale_y
+
         return (int(x_translated), int(y_translated))
 
     def read_labels(self, file):
