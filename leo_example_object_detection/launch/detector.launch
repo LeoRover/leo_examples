@@ -1,0 +1,11 @@
+<launch>
+    <arg name="labels" default="$(find leo_example_object_detection)/config/coco_labels.txt" doc="name of the file with labels for model"/>
+
+    <arg name="camera" default="camera/image_raw" doc="name of topic with Image messages"/>
+    <arg name="model" default="$(find leo_example_object_detection)/models/ssd_mobilenet_v1_1_metadata_1.tflite" doc="path to neural network model"/>
+    <arg name="config_file" default="$(find leo_example_object_detection)/config/label_colors.yaml"/>
+
+    <node name="object_detector" pkg="leo_example_object_detection" type="object_detector.py" clear_params="true" output="screen" args="-p $(arg model) -c $(arg camera) -l $(arg labels)">
+        <rosparam command="load" file="$(arg config_file)"/>
+    </node>
+</launch>

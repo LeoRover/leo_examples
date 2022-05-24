@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>leo_example_object_detection</name>
+  <version>0.0.0</version>
+  <description>
+    Object Detection Example for Leo Rover.
+  </description>
+
+  <maintainer email="support@fictionlab.pl">Fictionlab</maintainer>
+  <author email="aleks@fictionlab.pl">Aleksander Szymański</author>
+
+  <license>MIT</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>cv_bridge</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <depend>dynamic_reconfigure</depend>
+
+</package>
