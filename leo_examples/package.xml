@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>leo_examples</name>
+  <version>0.0.0</version>
+  <description>
+    A collection of ROS packages that show example usage of functionalities on stock Leo Rover.
+  </description>
+
+  <maintainer email="support@fictionlab.pl">Fictionlab</maintainer>
+  <author email="blazej@fictionlab.pl">Błażej Sowa</author>
+
+  <license>MIT</license>
+
+  <url type="bugtracker">https://github.com/LeoRover/leo_examples/issues</url>
+  <url type="repository">https://github.com/LeoRover/leo_examples</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>leo_example_follow_ar_tag</exec_depend>
+  <exec_depend>leo_example_line_follower</exec_depend>
+  <exec_depend>leo_example_object_detection</exec_depend>
+
+  <export>
+    <metapackage />
+  </export>
+</package>
