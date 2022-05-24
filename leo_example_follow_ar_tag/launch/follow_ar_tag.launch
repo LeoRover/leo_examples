@@ -14,7 +14,7 @@
   </node>
 
   <node name="follow_ar_tag"
-    pkg="leo_examples"
+    pkg="leo_example_follow_ar_tag"
     type="follow_ar_tag.py">
     <rosparam command="load" file="$(find leo_example_follow_ar_tag)/config/follow_ar_tag.yaml" />
   </node>
