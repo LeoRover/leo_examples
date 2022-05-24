@@ -22,12 +22,13 @@ class ObjectDetector:
 
         try:
             self.interpreter = tflite.Interpreter(model_path=modelPath)
-            input_details = self.interpreter.get_input_details()
-            self.input_shape = tuple(input_details[0]["shape"][1:3].tolist())
-            self.interpreter.allocate_tensors()
         except ValueError as e:
             rospy.logerr("Could not load tflite model: %s" % (modelPath))
-            raise ValueError("Model not loaded")
+            raise
+
+        input_details = self.interpreter.get_input_details()
+        self.input_shape = tuple(input_details[0]["shape"][1:3].tolist())
+        self.interpreter.allocate_tensors()
 
         self.read_labels(labels_file)
         self.build_color_dict()
