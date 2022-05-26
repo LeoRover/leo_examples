@@ -2,8 +2,8 @@
 Changelog for package leo_example_object_detection
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.0 (2022-05-26)
+------------------
 * Object Detection example (`#2 <https://github.com/LeoRover/leo_examples/issues/2>`_)
   * initial commit with base functionalities of the node
   * object_detector.py: switched use of hardcoded input img shape, to getting the shape from loaded model params

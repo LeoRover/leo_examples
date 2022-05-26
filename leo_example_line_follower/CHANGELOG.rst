@@ -2,8 +2,8 @@
 Changelog for package leo_example_line_follower
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.0 (2022-05-26)
+------------------
 * Line follower example (`#1 <https://github.com/LeoRover/leo_examples/issues/1>`_)
   * initial commit for line follower package
   * package.xml: remove redundant dependencies
