@@ -13,7 +13,9 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <exec_depend>ar_track_alvar</exec_depend>
+  <!-- Should be uncommented once ar_track_alvar is released to Noetic -->
+  <!-- <exec_depend>ar_track_alvar</exec_depend> -->
+
   <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>nav_msgs</exec_depend>
 
