@@ -3,7 +3,7 @@
   <name>leo_example_line_follower</name>
   <version>0.1.0</version>
   <description>
-    Neural Network model for line track following Example for Leo Rover.
+    A neural Network model for line track following Example for Leo Rover.
   </description>
 
   <maintainer email="support@fictionlab.pl">Fictionlab</maintainer>

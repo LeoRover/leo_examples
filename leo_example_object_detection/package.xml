@@ -3,7 +3,7 @@
   <name>leo_example_object_detection</name>
   <version>0.1.0</version>
   <description>
-    Object Detection Example for Leo Rover.
+    An object Detection Example for Leo Rover.
   </description>
 
   <maintainer email="support@fictionlab.pl">Fictionlab</maintainer>
