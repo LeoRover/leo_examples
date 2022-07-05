@@ -15,9 +15,9 @@ A collection of ROS packages that show example usage of functionalities on stock
 * [leo_example_follow_ar_tag] - package with scripts that make Leo Rover follow an ARTag
 
 Visit each package's tutorial on our page for more information:
-* [line_follower]
-* [object_detection]
-* [follow_artag]
+* [Line follower]
+* [Object detection]
+* [Follow artag]
   
 For more information about the robot, visit [Robots/Leo Rover].
 
@@ -25,10 +25,10 @@ For more information about the robot, visit [Robots/Leo Rover].
 [master]: https://github.com/LeoRover/leo_examples/tree/master
 [Robots/Leo Rover]: http://wiki.ros.org/Robots/Leo%20Rover
 [leo_example_line_follower]: http://wiki.ros.org/leo_example_line_follower
-[line_follower]: https://www.leorover.tech/integrations/line-follower
+[Line follower]: https://www.leorover.tech/integrations/line-follower
 [leo_example_object_detection]: http://wiki.ros.org/leo_example_object_detection
-[object_detection]: https://www.leorover.tech/integrations/object-detection
+[Object detection]: https://www.leorover.tech/integrations/object-detection
 [leo_example_follow_ar_tag]:  http://wiki.ros.org/leo_example_follow_ar_tag
-[follow_artag]: https://www.leorover.tech/integrations/follow-artag
+[Follow artag]: https://www.leorover.tech/integrations/follow-artag
 [0.1.0]: https://github.com/LeoRover/leo_examples/tree/0.1.0
 [leo_examples]: http://wiki.ros.org/leo_examples
