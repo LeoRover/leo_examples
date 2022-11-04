@@ -1,5 +1,5 @@
 # Marker size in cm
-marker_size: 16.0
+marker_size: 10.0
 
 max_new_marker_error: 0.08
 max_track_error: 0.2
