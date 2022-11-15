@@ -91,7 +91,7 @@ class ObjectDetector:
         final_img = self.draw_detections(cv_img, final_boxes)
 
         try:
-            msg = self.bridge.cv2_to_compressed_imgmsg(final_img)
+            msg = self.bridge.cv2_to_compressed_imgmsg(final_img, "jpeg")
             self.detection_pub.publish(msg)
         except cv_bridge.CvBridgeError() as e:
             rospy.logerror(e)
