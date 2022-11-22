@@ -2,6 +2,11 @@
 Changelog for package leo_example_line_follower
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fixed grammar errors in package.xml descriptions for object_detection and line_follower packages
+* Contributors: Aleksander Szymański
+
 0.1.0 (2022-05-26)
 ------------------
 * Line follower example (`#1 <https://github.com/LeoRover/leo_examples/issues/1>`_)
