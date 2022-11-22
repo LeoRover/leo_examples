@@ -2,8 +2,8 @@
 Changelog for package leo_example_line_follower
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.1 (2022-11-22)
+------------------
 * fixed grammar errors in package.xml descriptions for object_detection and line_follower packages
 * Contributors: Aleksander Szymański
 

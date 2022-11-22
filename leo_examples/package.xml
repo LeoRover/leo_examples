@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>leo_examples</name>
-  <version>0.1.0</version>
+  <version>0.1.1</version>
   <description>
     A collection of ROS packages that show an example usage of functionalities on a stock Leo Rover.
   </description>

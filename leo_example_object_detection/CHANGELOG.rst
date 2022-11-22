@@ -2,8 +2,8 @@
 Changelog for package leo_example_object_detection
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.1 (2022-11-22)
+------------------
 * object_detection: object_detector: changed compression format of image_compressed to jpeg
 * fixed grammar errors in package.xml descriptions for object_detection and line_follower packages
 * Contributors: Aleksander Szymański

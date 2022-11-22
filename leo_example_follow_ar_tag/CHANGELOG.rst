@@ -2,8 +2,8 @@
 Changelog for package leo_example_follow_ar_tag
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.1 (2022-11-22)
+------------------
 * Merge branch 'master' of github.com:LeoRover/leo_examples
 * Change default marker size
 * Contributors: Piotr Szlachcic
